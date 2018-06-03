@@ -1,65 +1,82 @@
 /* GLOBAL SYMBOLIC CONSTANTS */
-/* Standard encapsulation of a system action */
-#define SYSTEMACTION "--------------------"
-/**/
+#define USERNAMESIZE 16
 
-
-/* STRUCTURES DEFINITIONS FOR cMESSENGER */
+/* STRUCTURES DEFINITIONS */
 /* Structure that is used to store data about a user:
  Includes a username (16 characters max) and a color, saved as an int */
 struct User
 {
-    char userName[16];
+    char userName[USERNAMESIZE];
     
-    /* Reference: https://misc.flogisoft.com/bash/tip_colors_and_formatting */
+    /* Color Reference: https://misc.flogisoft.com/bash/tip_colors_and_formatting */
     int userColor;
-};
+} typedef USER;
 
 /* Message structure is a linked-list node that is used to store data about a single message:
- Includes data of the sender (in the User structure),
- message string,
+ Includes data of the sender (in the User structure's pointer),
+ message string's pointer,
  indentation that tells the printing function whether the sender name should be printed
  and an address of the next message */
 struct Message
 {
-    struct User* sender;
+    USER* sender;
     
     char* message;
     int indentation;
     
     struct Message* next;
-};
+} typedef MESSAGE;
 
 /* Message History is a linked-list consisting of Message nodes. As such, it contains an address of the first Message structure */
 struct MessageHistory
 {
-    struct Message* top;
-};
+    MESSAGE* top;
+} typedef MESSAGEHISTORY;
 /**/
 
+/* GLOBAL DECLARATION */
+/* System user (cMessenger). Defined at cMessenger.c */
+extern USER* SYSTEMUSER;
+/* Current User. Defined at cMessenger.c
+ The pointer cannot be changed, but the values pointed to can be */
+extern USER* const CUSER;
+/* Message thread of the session. Defined at cMessenger.c */
+extern MESSAGEHISTORY* MESSAGEHIST;
+/* Standard encapsulation of a system action. Defined at messageIO.c */
+extern const char* SYSTEMACTION;
+/**/
 
-/* FUNCTIONS PROTOTYPES FOR cMESSENGER */
-/* Create a user structure */
-struct User* CreateUser(struct User*, struct User*, struct MessageHistory*);
+/* FUNCTIONS PROTOTYPES */
+/* Create a user structure
+ defined at dataStructures.c */
+void CreateUser();
 
-/* Create a listening host using a socket */
-int CreateServer(struct User*, struct User*, struct User*, struct MessageHistory*);
+/* Add a new node to the dynamic structure
+ defined at dataStructures.c */
+void AddMessage(USER*, char*, int);
 
-/* Create a client by connecting to a listening socket at a specified IP address */
-int CreateClient(struct User*, struct User*, struct MessageHistory*);
+/* Create a listening host using a socket
+ defined at connection.c */
+int CreateServer(USER*);
 
-/* FUNCTIONS PROTOTYPES FOR cMESSENGER */
+/* Create a client by connecting to a listening socket at a specified IP address
+ defined at connection.c */
+int CreateClient();
+
 /* A universal string processing method that includes systems calls.
  Allocates memory for a string with the size specified.
  By default, returns the pointer to the string.
- */
-char* ProcessMessage(int, int, struct MessageHistory*);
+ defined at printMessages.c */
+char* ProcessMessage(int, int);
 
-/* Print a message */
-void PrintMessage(struct User*, char*, int);
+/* Print a message
+ defined at printMessages.c */
+void PrintMessage(USER*, char*, int);
 
-/* Add a new node to the dynamic structure */
-void AddMessage(struct MessageHistory*, struct User*, char*, int);
+/* Print a passed profile's information
+ defined at printMessages.c */
+void PrintProfile(USER*);
 
-/* Traverse the dynamic strucre of messages */
-void PrintHistory(struct Message*);
+/* Traverse the dynamic strucre of messages
+ defined at printMessages.c */
+void PrintHistory(MESSAGE*);

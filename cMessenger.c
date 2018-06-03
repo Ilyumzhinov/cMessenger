@@ -1,11 +1,19 @@
 /* Compile:
-    gcc cMessenger.c printMessages.c establishConnection.c -o cMessenger
+    gcc cMessenger.c messageIO.c dataStructures.c connection.c -o cMessenger
 */
 #include "cMessenger.h"
 
 #include <stdio.h> /* for printf() */
-#include <stdlib.h> /* for malloc() */
 #include <string.h> /* for strcopy() */
+
+/* GLOBAL DEFINITION */
+/* Initialise a global system user constant */
+USER* SYSTEMUSER = &(USER){ .userName = "cMessenger", .userColor = 100 };
+/* Initialise a global current user pointer constant */
+USER* const CUSER = &(USER){ .userName = "\0", .userColor = 0 };
+/* Initialise a constant linked-list structure that keeps track of messages */
+MESSAGEHISTORY* MESSAGEHIST = &(MESSAGEHISTORY){ .top = NULL };
+/**/
 
 /* Main logic */
 int main()
@@ -13,41 +21,34 @@ int main()
     /* Declaration */
     #define MENUCHOICESIZE 1
     
-    /* Reference: https://stackoverflow.com/questions/11709929/how-to-initialize-a-pointer-to-a-struct-in-c */
-    struct User* systemUser = &(struct User){ .userName = "cMessenger", .userColor = 100 };
-    struct User* currentUser = NULL;
-    struct User* connectionUser = NULL;
-    struct MessageHistory* messageHistory = NULL;
-    
+    /* Current user information (set up at the beginning of the program execution) */
+    /* Connection user information is received when a user connect to a server */
+    USER* connectionUser = NULL;
+    /* Menu option selected */
 	char menuChoice[MENUCHOICESIZE];
-    char* strPtr;
-
-    messageHistory = (struct MessageHistory*)malloc(sizeof(struct MessageHistory));
-	messageHistory->top = NULL;
 	/**/
 
+    /* Create a user */
+    {
+        /* Welcome message */
+        AddMessage(SYSTEMUSER, "Welcome!", 0);
+        
+        /* Create a user */
+        CreateUser();
+    }
+    
+    /* Continue with the program execution until the system character is typed in */
 	for(;;)
 	{
         menuChoice[0] = '\0';
 
-	    if (NULL == currentUser)
+	    /* Print main menu */
 	    {
-	        /* Welcome message */
-	       	AddMessage(messageHistory, systemUser, "Welcome!", 0);
-
-	        /* Creating a user */
-	        CreateUser(systemUser, currentUser, messageHistory);
-	        /**/
-	    }
-
-	    /* Printing main menu */
-	    {
-	    	AddMessage(messageHistory, systemUser, "Choose from the options", 0);
-
+	    	AddMessage(SYSTEMUSER, "Choose from the options", 0);
 	    	{
 	    		printf("%s\n", SYSTEMACTION);
-		    	PrintMessage(systemUser, "1 | Open chat", 1);
-		    	PrintMessage(systemUser, "2 | Join chat", 1);
+		    	PrintMessage(SYSTEMUSER, "1 | Open chat", 1);
+		    	PrintMessage(SYSTEMUSER, "2 | Join chat", 1);
 		    	printf("%s\n", SYSTEMACTION);
 		    }
 	    }
@@ -55,20 +56,20 @@ int main()
 	    /* Processing the menu choice */
 	    while (menuChoice[0] < 49 || menuChoice[0] > 50)
 	    {
-	        strncpy(menuChoice, ProcessMessage(1, 0, messageHistory), 1);
+	        strncpy(menuChoice, ProcessMessage(1, 0), 1);
 	    }
 
-	    AddMessage(messageHistory, currentUser, menuChoice, 0);
+	    AddMessage(CUSER, menuChoice, 0);
 
 		/* Open chat */
 		if (49 == menuChoice[0])
 		{
-			CreateServer(systemUser, currentUser, connectionUser, messageHistory);
+			CreateServer(connectionUser);
 		}
 	    /* Join chat */
 	    else if (50 == menuChoice[0])
 	    {
-	        CreateClient(systemUser, currentUser, messageHistory);
+	        CreateClient();
 	    }
 	}
 }
