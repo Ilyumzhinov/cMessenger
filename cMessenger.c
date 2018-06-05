@@ -1,5 +1,5 @@
 /* Compile:
-    gcc cMessenger.c messageIO.c dataStructures.c connection.c -o cMessenger
+    gcc cMessenger.c messageIO.c dataStructures.c connectivity.c -o cMessenger
 */
 #include "cMessenger.h"
 
@@ -64,12 +64,12 @@ int main()
 		/* Open chat */
 		if (49 == menuChoice[0])
 		{
-			CreateServer(connectionUser);
+			CreateServer();
 		}
-	    /* Join chat */
-	    else if (50 == menuChoice[0])
-	    {
-	        CreateClient();
-	    }
+	  /* Join chat */
+	  else if (50 == menuChoice[0])
+	  {
+	    CreateClient();
+	  }
 	}
 }

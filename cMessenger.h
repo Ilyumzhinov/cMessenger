@@ -57,7 +57,7 @@ void AddMessage(USER*, char*, int);
 
 /* Create a listening host using a socket
  defined at connection.c */
-int CreateServer(USER*);
+int CreateServer();
 
 /* Create a client by connecting to a listening socket at a specified IP address
  defined at connection.c */
